@@ -1,9 +1,14 @@
 import express from 'express'
 import  videoshow from 'videoshow'
+import path from 'path'
 
 const app = express()
 const port = 3000
+
+
+app.use(express.static('public'));
 app.use("/video", async (req, res) => {
+    const filePath = path.join(process.cwd(), 'public', 'output', 'new.mp4');
 
     var secondsToShowEachImage = 1
     var finalVideoPath = './test2.mp4'
@@ -26,7 +31,7 @@ app.use("/video", async (req, res) => {
     ]
 
     videoshow(images, videoOptions)
-        .save(finalVideoPath)
+        .save(filePath)
         .on('start', function (command) {
             console.log('encoding ' + finalVideoPath + ' with command ' + command)
         })
@@ -34,11 +39,11 @@ app.use("/video", async (req, res) => {
             return Promise.reject(new Error(err))
         })
         .on('end', function (output) {
-            // do stuff here when done
+            res.sendFile(filePath)
         })
 
-    res.json(req.query)
 })
+
 
 app.use("/", (req, res) => {
     res.json({
