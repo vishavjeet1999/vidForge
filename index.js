@@ -1,6 +1,7 @@
 import express from 'express'
 import  videoshow from 'videoshow'
 import path from 'path'
+import nodeHtmlToImage from 'node-html-to-image'
 
 const app = express()
 const port = 3000
@@ -46,9 +47,16 @@ app.use(express.static('public'));
 
 
 app.use("/", (req, res) => {
-    res.json({
-        message: "hello"
-    })
+    nodeHtmlToImage({
+        output: './image.png',
+        html: '<html><body>Hello world!</body></html>'
+      })
+        .then(() => {
+            res.sendFile(path.join(process.cwd(), 'image.png'))
+        })
+    // res.json({
+    //     message: "hello"
+    // })
 })
 
 
