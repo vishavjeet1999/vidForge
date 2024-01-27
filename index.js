@@ -1,9 +1,6 @@
 import express from 'express'
-import videoshow from 'videoshow'
-import path from 'path'
-import nodeHtmlToImage from 'node-html-to-image'
-import puppeteer from 'puppeteer'
-import chromium from 'chrome-aws-lambda';
+import edgeChromium from 'chrome-aws-lambda'
+import puppeteer from 'puppeteer-core'
 
 const app = express()
 const port = 3000
@@ -21,18 +18,18 @@ app.use("/screenshot", async (req, res) => {
     // await page.screenshot({ path: filePath });
     // await browser.close();
     // res.sendFile(filePath)
-    const browser = await chromium.puppeteer.launch({
-        args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
-        headless: true,
-        ignoreHTTPSErrors: true,
+    const executablePath = await edgeChromium.executablePath
+
+    const browser = await puppeteer.launch({
+        executablePath,
+        args: edgeChromium.args,
+        headless: false,
     })
-    const page = await browser.newPage();
-    await page.goto("https://www.webpagetest.org/", { timeout: 0 });
-    await page.screenshot({ path: filePath });
-    await browser.close();
-    res.sendFile(filePath)
+
+    const page = await browser.newPage()
+    await page.goto('https://github.com')
+
+    res.send('hello')
 })
 
 app.use("/", async (req, res) => {
