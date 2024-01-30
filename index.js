@@ -1,42 +1,87 @@
-import express from 'express'
-import edgeChromium from 'chrome-aws-lambda'
-import puppeteer from 'puppeteer-core'
+// import fs from 'fs'
+// import { createCanvas, loadImage } from 'canvas'
 
-const app = express()
-const port = 3000
+// const width = 1200
+// const height = 630
 
+// const canvas = createCanvas(width, height)
+// const context = canvas.getContext('2d')
 
-app.use(express.static('public'));
+// context.fillStyle = '#000'
+// context.fillRect(0, 0, width, height)
 
+// context.font = 'bold 70pt Menlo'
+// context.textAlign = 'center'
+// context.textBaseline = 'top'
+// context.fillStyle = '#3574d4'
 
-app.use("/screenshot", async (req, res) => {
-    const filePath = path.join(process.cwd(), 'public', 'output', `screenshot.png`);
+// const text = 'Hello, World!'
 
-    // const browser = await puppeteer.launch();
-    // const page = await browser.newPage();
-    // await page.goto("https://www.webpagetest.org/", { timeout: 0 });
-    // await page.screenshot({ path: filePath });
-    // await browser.close();
-    // res.sendFile(filePath)
-    const executablePath = await edgeChromium.executablePath
+// const textWidth = context.measureText(text).width
+// context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
+// context.fillStyle = '#fff'
+// context.fillText(text, 600, 170)
 
-    const browser = await puppeteer.launch({
-        executablePath,
-        args: edgeChromium.args,
-        headless: false,
-    })
+// context.fillStyle = '#fff'
+// context.font = 'bold 30pt Menlo'
+// context.fillText('flaviocopes.com', 600, 530)
 
-    const page = await browser.newPage()
-    await page.goto('https://github.com')
-
-    res.send('hello')
-})
-
-app.use("/", async (req, res) => {
-    res.json({
-        message: "hello"
-    })
-})
+// loadImage('./logo.png').then(image => {
+//   context.drawImage(image, 340, 515, 70, 70)
+//   const buffer = canvas.toBuffer('image/png')
+//   fs.writeFileSync('./test.png', buffer)
+// })
 
 
-app.listen(port, () => { console.log(`Server running on port ${port}`) })
+import express from 'express';
+import fs from 'fs';
+import { createCanvas, loadImage } from 'canvas';
+
+const app = express();
+const port = 3000;
+
+app.get('/image', async (req, res) => {
+  try {
+    const width = 1200;
+    const height = 630;
+
+    const canvas = createCanvas(width, height);
+    const context = canvas.getContext('2d');
+
+    context.fillStyle = '#000'
+context.fillRect(0, 0, width, height)
+
+context.font = 'bold 70pt Menlo'
+context.textAlign = 'center'
+context.textBaseline = 'top'
+context.fillStyle = '#3574d4'
+
+const text = 'Hello, World!'
+
+const textWidth = context.measureText(text).width
+context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
+context.fillStyle = '#fff'
+context.fillText(text, 600, 170)
+
+context.fillStyle = '#fff'
+context.font = 'bold 30pt Menlo'
+context.fillText('flaviocopes.com', 600, 530)
+
+    // Your existing canvas drawing code (without function declarations)
+
+    const buffer = await loadImage('./logo.png').then(image => {
+      context.drawImage(image, 340, 515, 70, 70);
+      return canvas.toBuffer('image/png');
+    });
+
+    res.setHeader('Content-Type', 'image/png');
+    res.send(buffer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error generating image');
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
